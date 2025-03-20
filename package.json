@@ -2,6 +2,7 @@
   "name": "@w3vish/ffmpeg-installer",
   "version": "1.0.0",
   "description": "Cross-platform FFmpeg and FFprobe binary installer",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -36,10 +37,12 @@
   },
   "files": [
     "dist",
-    "binaries",
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/node": "^20.17.24",
     "@types/tar": "^6.1.13",

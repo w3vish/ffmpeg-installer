@@ -1,5 +1,19 @@
 import path from 'path';
 import { PlatformInfo, DownloadSource } from './types';
+import { fileURLToPath } from 'url';
+
+
+let __filename: string = '';
+let __dirname: string = '';
+
+if (typeof __dirname === 'undefined') {
+  __filename = fileURLToPath(import.meta.url);
+  __dirname = path.dirname(__filename);
+} else {
+  __filename = __filename;
+  __dirname = __dirname;
+}
+
 
 /**
  * Base directory for storing binaries

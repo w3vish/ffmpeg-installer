@@ -1,0 +1,65 @@
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/package.json b/package.json[m
+[1mindex ae6f347..b909d0b 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -2,6 +2,7 @@[m
+   "name": "@w3vish/ffmpeg-installer",[m
+   "version": "1.0.0",[m
+   "description": "Cross-platform FFmpeg and FFprobe binary installer",[m
+[32m+[m[32m  "type": "module",[m
+   "main": "dist/index.js",[m
+   "types": "dist/index.d.ts",[m
+   "exports": {[m
+[36m@@ -36,10 +37,12 @@[m
+   },[m
+   "files": [[m
+     "dist",[m
+[31m-    "binaries",[m
+     "README.md",[m
+     "LICENSE"[m
+   ],[m
+[32m+[m[32m  "publishConfig": {[m
+[32m+[m[32m    "access": "public"[m
+[32m+[m[32m  },[m
+   "devDependencies": {[m
+     "@types/node": "^20.17.24",[m
+     "@types/tar": "^6.1.13",[m
+[1mdiff --git a/src/constants.ts b/src/constants.ts[m
+[1mindex 6ab2af0..e9ca756 100644[m
+[1m--- a/src/constants.ts[m
+[1m+++ b/src/constants.ts[m
+[36m@@ -1,5 +1,19 @@[m
+ import path from 'path';[m
+ import { PlatformInfo, DownloadSource } from './types';[m
+[32m+[m[32mimport { fileURLToPath } from 'url';[m
+[32m+[m
+[32m+[m
+[32m+[m[32mlet __filename: string = '';[m
+[32m+[m[32mlet __dirname: string = '';[m
+[32m+[m
+[32m+[m[32mif (typeof __dirname === 'undefined') {[m
+[32m+[m[32m  __filename = fileURLToPath(import.meta.url);[m
+[32m+[m[32m  __dirname = path.dirname(__filename);[m
+[32m+[m[32m} else {[m
+[32m+[m[32m  __filename = __filename;[m
+[32m+[m[32m  __dirname = __dirname;[m
+[32m+[m[32m}[m
+[32m+[m
+ [m
+ /**[m
+  * Base directory for storing binaries[m
+[1mdiff --git a/tsconfig.json b/tsconfig.json[m
+[1mindex 1ad3af1..b889c52 100644[m
+[1m--- a/tsconfig.json[m
+[1m+++ b/tsconfig.json[m
+[36m@@ -1,7 +1,7 @@[m
+ {[m
+     "compilerOptions": {[m
+[31m-      "target": "ES2018",[m
+[31m-      "module": "commonjs",[m
+[32m+[m[32m      "target": "ESNext",[m
+[32m+[m[32m      "module": "ESNext",[m
+       "declaration": true,[m
+       "outDir": "./dist",[m
+       "strict": true,[m
