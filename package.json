@@ -1,6 +1,6 @@
 {
   "name": "@w3vish/ffmpeg-installer-demo",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "type": "module",
   "description": "Cross-platform FFmpeg and FFprobe binary installer",
   "main": "dist/index.cjs",
