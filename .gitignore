@@ -1,6 +1,7 @@
 # Build output
 dist/
 build/
+test/
 
 # Downloaded binaries
 binaries/

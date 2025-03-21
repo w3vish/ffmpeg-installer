@@ -1,17 +1,17 @@
 {
   "name": "@w3vish/ffmpeg-installer-demo",
-  "version": "1.0.11",
+  "version": "1.0.14",
   "type": "module",
   "description": "Cross-platform FFmpeg and FFprobe binary installer",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+ "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.cjs"
   },
   "scripts": {
-    "build": "tsc && cp dist/index.js dist/index.cjs",
+    "build": "rm -rf dist && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build"
   },
