@@ -66,14 +66,14 @@ function getInstalledBinaries(): FFmpegInstaller {
 }
 
 // Get binary data once to avoid redundant function calls
-const installedBinaries = getInstalledBinaries();
+const FFmpegInstaller = getInstalledBinaries();
 
 // Export main functionality
-export default installedBinaries;
+export default FFmpegInstaller;
 
 // Export individual paths for convenience
-export const path = installedBinaries.ffmpeg?.path;
-export const ffmpegPath = installedBinaries.ffmpeg?.path;
-export const ffprobePath = installedBinaries.ffprobe?.path;
-export const version = installedBinaries.ffmpeg?.version;
-export const url = installedBinaries.ffmpeg?.url;
+export const path = FFmpegInstaller.ffmpeg?.path;
+export const ffmpegPath = FFmpegInstaller.ffmpeg?.path;
+export const ffprobePath = FFmpegInstaller.ffprobe?.path;
+export const version = FFmpegInstaller.ffmpeg?.version;
+export const url = FFmpegInstaller.ffmpeg?.url;

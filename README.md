@@ -1,71 +1,60 @@
-# FFmpeg Installer
+# @w3vish/ffmpeg-installer
 
-[![npm version](https://img.shields.io/npm/v/ffmpeg-installer.svg)](https://www.npmjs.com/package/ffmpeg-installer)
+[![npm version](https://img.shields.io/npm/v/@w3vish/ffmpeg-installer.svg)](https://www.npmjs.com/package/@w3vish/ffmpeg-installer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A cross-platform FFmpeg binary installer for Node.js applications. This package automatically downloads and configures FFmpeg binaries for your platform, making it easy to use FFmpeg in your Node.js projects without manual installation.
+A cross-platform FFmpeg binary installer for Node.js applications. This package provides a simple way to download and configure FFmpeg binaries for your platform, making it easy to use FFmpeg in your Node.js projects without manual installation.
 
-## Features
-
-- 🚀 Automatic FFmpeg/FFprobe binary installation
-- 🔄 Cross-platform support (Windows, macOS, Linux, and more)
-- 📦 Simple API for accessing binary paths
-- ⚙️ Customizable installation options
-- ✨ Optimized download with progress tracking
-- 🔍 Flexible - install only what you need (FFmpeg only, FFprobe only, or both)
+## ⚠️ ESM Only
+**This package only supports ES Modules**. CommonJS require() is not supported.
 
 ## Installation
 
 ```bash
-# Install both FFmpeg and FFprobe (default)
-npm install ffmpeg-installer
-
-# Install only FFmpeg
-npm install ffmpeg-installer --ffmpeg-only
-
-# Install only FFprobe
-npm install ffmpeg-installer --ffprobe-only
+# Install the package
+npm install @w3vish/ffmpeg-installer
 ```
+
+After installation, run the CLI tool to install binaries:
+
+```bash
+# Install binaries via CLI
+npx @w3vish/ffmpeg-installer
+```
+
+The CLI will prompt you to select which components to install:
+1. FFmpeg and FFprobe (default)
+2. FFmpeg only
+3. FFprobe only
 
 ## Usage
 
-### Basic Usage
-
 ```javascript
-// ES modules
-import ffmpeg from 'ffmpeg-installer';
+// Import the package
+import FFmpegInstaller from '@w3vish/ffmpeg-installer';
 
-// CommonJS
-const ffmpeg = require('ffmpeg-installer');
-
-console.log('FFmpeg path:', ffmpeg.ffmpegPath);
-console.log('FFprobe path:', ffmpeg.ffprobePath);
-console.log('FFmpeg version:', ffmpeg.version);
+// Access the data directly
+console.log('FFmpeg path:', FFmpegInstaller.ffmpeg.path);
+console.log('FFprobe path:', FFmpegInstaller.ffprobe.path);
+console.log('FFmpeg version:', FFmpegInstaller.ffmpeg.version);
+console.log('Platform:', FFmpegInstaller.platform);
+console.log('Architecture:', FFmpegInstaller.arch);
 ```
 
 ### With child_process
 
 ```javascript
 import { spawn } from 'child_process';
-import { ffmpegPath } from 'ffmpeg-installer';
+import FFmpegInstaller from '@w3vish/ffmpeg-installer';
 
-const process = spawn(ffmpegPath, [
+const process = spawn(FFmpegInstaller.ffmpeg.path, [
   '-i', 'input.mp4',
   '-c:v', 'libx264',
-  '-preset', 'fast',
   'output.mp4'
 ]);
 
-process.stdout.on('data', (data) => {
-  console.log(`stdout: ${data}`);
-});
-
-process.stderr.on('data', (data) => {
-  console.log(`stderr: ${data}`);
-});
-
 process.on('close', (code) => {
-  console.log(`Child process exited with code ${code}`);
+  console.log(`Process exited with code ${code}`);
 });
 ```
 
@@ -73,11 +62,11 @@ process.on('close', (code) => {
 
 ```javascript
 import ffmpeg from 'fluent-ffmpeg';
-import { ffmpegPath, ffprobePath } from 'ffmpeg-installer';
+import FFmpegInstaller from '@w3vish/ffmpeg-installer';
 
 // Set paths
-ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath);
+ffmpeg.setFfmpegPath(FFmpegInstaller.ffmpeg.path);
+ffmpeg.setFfprobePath(FFmpegInstaller.ffprobe.path);
 
 // Use fluent-ffmpeg
 ffmpeg('input.mp4')
@@ -85,104 +74,89 @@ ffmpeg('input.mp4')
   .on('end', () => {
     console.log('Conversion finished');
   })
-  .on('error', (err) => {
-    console.error('Error:', err);
-  })
   .run();
 ```
 
-## Advanced Usage
+## CLI Options
 
-### Custom Platform Installation
-
-You can install binaries for a specific platform by providing the `--platform` flag:
+When running the installer CLI, you can specify options:
 
 ```bash
-npm install ffmpeg-installer --platform=win32-x64
+npx @w3vish/ffmpeg-installer --platform=darwin-arm64 --ffmpeg-only
 ```
 
-Supported platforms:
-- `win32-x64` - Windows 64-bit
-- `win32-ia32` - Windows 32-bit
-- `darwin-x64` - macOS 64-bit
-- `darwin-arm64` - macOS Apple Silicon
-- `linux-x64` - Linux 64-bit
-- `linux-arm64` - Linux ARM 64-bit
-- `linux-armv7l` - Linux ARM v7
+Available options:
+- `--platform=<platform>`: Specify platform (win32-x64, darwin-arm64, linux-x64, etc.)
+- `--ffmpeg-only`: Install only FFmpeg
+- `--ffprobe-only`: Install only FFprobe
 
-### Install Only What You Need
+## Supported Platforms
 
-You can choose to install only FFmpeg or only FFprobe:
+- Windows (win32-x64, win32-ia32)
+- macOS (darwin-x64, darwin-arm64)
+- Linux (linux-x64, linux-arm64, linux-armv7l)
 
-```bash
-# FFmpeg only
-npm install ffmpeg-installer --ffmpeg-only
+## Return Object Structure
 
-# FFprobe only
-npm install ffmpeg-installer --ffprobe-only
+The package exports an `FFmpegInstaller` object with this structure:
 
-# Combine with platform specific installation
-npm install ffmpeg-installer --platform=darwin-arm64 --ffmpeg-only
+```javascript
+{
+  ffmpeg: {
+    path: '/path/to/ffmpeg',
+    version: 'v1.0.0',
+    url: 'https://github.com/w3vish/ffmpeg-installer/releases/download/v1.0.0/linux-x64-ffmpeg'
+  },
+  ffprobe: {
+    path: '/path/to/ffprobe',
+    version: 'v1.0.0',
+    url: 'https://github.com/w3vish/ffmpeg-installer/releases/download/v1.0.0/linux-x64-ffprobe'
+  },
+  platform: 'linux',
+  arch: 'x64'
+}
 ```
 
-## API
+## TypeScript Types
 
-The package exports the following properties:
+The package includes TypeScript definitions:
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `path` | `string` | Path to the FFmpeg binary (alias for `ffmpegPath`) |
-| `ffmpegPath` | `string` | Path to the FFmpeg binary |
-| `ffprobePath` | `string` | Path to the FFprobe binary |
-| `version` | `string` | Version of the FFmpeg binaries |
-| `url` | `string` | URL from where the binaries were downloaded |
-| `platform` | `string` | Current platform identifier |
-| `arch` | `string` | Current architecture identifier |
+```typescript
+// Main installer result
+export interface FFmpegInstaller {
+  ffmpeg?: BinaryInfo;
+  ffprobe?: BinaryInfo;
+  platform: string;
+  arch: string;
+}
 
-## How It Works
-
-This package follows these steps during installation:
-
-1. **Platform Detection**: Automatically identifies your system's platform and architecture
-2. **Download**: Fetches the appropriate FFmpeg binaries from reliable sources
-3. **Extraction**: Unpacks the downloaded archive
-4. **Configuration**: Sets up the binaries and creates a configuration file
-5. **Cleanup**: Removes temporary files
-
-The downloaded binaries are stored in a platform-specific directory within the package, making them accessible across your application.
+// Binary information
+export interface BinaryInfo {
+  path: string;
+  version: string;
+  url: string;
+}
+```
 
 ## Troubleshooting
 
 ### Permission Issues
 
-If you encounter permission errors when running the binaries:
+If you encounter permission errors when running the binaries on Linux/macOS:
 
 ```bash
-# For Linux/macOS
 chmod +x /path/to/ffmpeg
 chmod +x /path/to/ffprobe
 ```
 
 ### Installation Failures
 
-If the installation fails, you can try:
+If the installation fails, try:
 
 ```bash
-npm install ffmpeg-installer --unsafe-perm
-```
-
-### Custom Binary Location
-
-If you have FFmpeg binaries installed elsewhere, you can manually set the path in your app:
-
-```javascript
-import { spawn } from 'child_process';
-
-// Override the path
-const ffmpegPath = '/custom/path/to/ffmpeg';
-const process = spawn(ffmpegPath, [...your args]);
+npm install @w3vish/ffmpeg-installer --unsafe-perm
 ```
 
 ## License
 
-MIT © Vishal Suryavanshi
+MIT

@@ -1,50 +1,60 @@
 {
-  "name": "@w3vish/ffmpeg-installer-demo",
-  "version": "1.0.15",
+  "name": "@w3vish/ffmpeg-installer",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Cross-platform FFmpeg and FFprobe binary installer",
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
+  "description": "A fast and lightweight cross-platform FFmpeg & FFprobe binary installer for Node.js, supporting Linux, macOS, and Windows.",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
-    "import": "./dist/esm/index.js",
-    "require": "./dist/cjs/index.cjs"
+    "import": "./dist/index.js"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+    "build": "rm -rf dist && tsc --project tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build"
   },
   "bin": {
-    "ffmpeg-installer-demo": "./dist/cjs/installer.cjs"
+    "ffmpeg-installer": "./dist/installer.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "ffmpeg",
     "ffprobe",
-    "installer",
-    "binary",
     "ffmpeg installer",
+    "ffmpeg binary",
     "static ffmpeg",
-    "cross-platform"
+    "cross-platform",
+    "nodejs",
+    "media processing",
+    "video encoding",
+    "audio encoding",
+    "video converter",
+    "ffmpeg npm"
   ],
-  "author": "w3vish",
+  "author": {
+    "name": "w3vish",
+    "url": "https://github.com/w3vish"
+  },
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/w3vish/ffmpeg-installer"
   },
+  "bugs": {
+    "url": "https://github.com/w3vish/ffmpeg-installer/issues"
+  },
+  "homepage": "https://github.com/w3vish/ffmpeg-installer#readme",
   "publishConfig": {
     "access": "public"
   },
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    "dist/cjs/installer.cjs"
-  ],
   "devDependencies": {
     "@types/node": "^20.17.24",
     "extract-zip": "^2.0.1",

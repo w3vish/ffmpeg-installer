@@ -1,5 +1,10 @@
 import path from 'path';
 import { PlatformInfo, DownloadSource } from './types.js';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 /**
  * Base directory for storing binaries
