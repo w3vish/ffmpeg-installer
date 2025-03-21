@@ -67,13 +67,68 @@ export interface FFmpegInstaller {
  * Platform information
  */
 export interface PlatformInfo {
+  /**
+   * Operating system platform (win32, darwin, linux, etc.)
+   */
   platform: string;
+  
+  /**
+   * CPU architecture (x64, ia32, arm64, etc.)
+   */
   arch: string;
+  
+  /**
+   * Combined platform-arch identifier
+   */
   identifier: string;
+  
+  /**
+   * Binary filenames for this platform
+   */
   binaryName: {
     ffmpeg: string;
     ffprobe: string;
   };
+}
+
+/**
+ * Secondary download configuration for separate ffmpeg/ffprobe downloads
+ */
+export interface SecondaryDownload {
+  /**
+   * URL to download the secondary binary
+   */
+  url: string;
+  
+  /**
+   * File format of the download (if different from primary)
+   */
+  format?: 'zip' | 'tar.gz' | 'binary' | 'aar' | 'pkg' | 'tar.xz';
+  
+  /**
+   * Path to binary within the archive
+   */
+  path: string;
+}
+
+/**
+ * Platform-specific options for download and extraction
+ */
+export interface DownloadOptions {
+  /**
+   * Custom headers for download requests
+   */
+  headers?: Record<string, string>;
+  
+  /**
+   * Target architecture for platform-specific downloads
+   */
+  arch?: string;
+  
+  /**
+   * Other platform-specific options
+   */
+  [key: string]: any;
 }
 
 /**
@@ -86,24 +141,36 @@ export interface DownloadSource {
   url: string;
  
   /**
-   * File format of the download (zip, tar.gz, etc.)
+   * File format of the download
    */
   format: 'zip' | 'tar.gz' | 'binary' | 'aar' | 'pkg' | 'tar.xz';
  
   /**
    * Path to FFmpeg within the archive
+   * Can be null for secondary download configurations
    */
-  ffmpegPath: string;
+  ffmpegPath: string | null;
  
   /**
    * Path to FFprobe within the archive
+   * Can be null for secondary download configurations
    */
-  ffprobePath: string;
+  ffprobePath: string | null;
  
   /**
    * Version of FFmpeg
    */
   version: string;
+  
+  /**
+   * Secondary download for platforms that need separate downloads for ffmpeg/ffprobe
+   */
+  secondaryDownload?: SecondaryDownload;
+  
+  /**
+   * Additional options for download and extraction
+   */
+  options?: DownloadOptions;
 }
 
 /**

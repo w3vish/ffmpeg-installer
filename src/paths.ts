@@ -1,7 +1,7 @@
 import os from 'os';
 import path from 'path';
-import { SUPPORTED_PLATFORMS, BINARIES_DIR } from './constants'
-import { PlatformInfo } from './types';
+import { SUPPORTED_PLATFORMS, BINARIES_DIR } from './constants.js';
+import { PlatformInfo } from './types.js';
 
 /**
  * Get the current platform information

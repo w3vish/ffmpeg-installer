@@ -1,0 +1,15 @@
+# Exclude source code and unnecessary files
+src/
+node_modules/
+test/
+scripts/
+binaries
+tsconfig.json
+/tsconfig.json
+tsconfig.build.json
+.npmrc
+.gitignore
+.eslintrc.js
+.prettierrc
+*.log
+*.lock

@@ -1,8 +1,8 @@
 import fs from 'fs';
-import { CONFIG_FILE_PATH } from './constants';
-import { getCurrentPlatform, getBinaryPath } from './paths';
-import { verifyFile } from './verify';
-import { FFmpegInstaller, BinaryInfo, ConfigFile } from './types';
+import { CONFIG_FILE_PATH } from './constants.js';
+import { getCurrentPlatform, getBinaryPath } from './paths.js';
+import { verifyFile } from './verify.js';
+import { FFmpegInstaller, BinaryInfo, ConfigFile } from './types.js';
 
 /**
  * Get the installed FFmpeg and FFprobe binaries for the current platform
