@@ -1,6 +1,6 @@
 {
   "name": "@w3vish/ffmpeg-installer",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "type": "module",
   "description": "A fast and lightweight cross-platform FFmpeg & FFprobe binary installer for Node.js, supporting Linux, macOS, and Windows.",
   "main": "dist/index.js",

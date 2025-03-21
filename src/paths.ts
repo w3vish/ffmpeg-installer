@@ -11,7 +11,7 @@ export function getCurrentPlatform(): PlatformInfo | null {
     const platform = os.platform();
     const arch = os.arch();
 
-    return SUPPORTED_PLATFORMS.find((p: any) => p.platform === platform && p.arch === arch) || null;
+    return SUPPORTED_PLATFORMS.find(p => p.platform === platform && p.arch === arch) || null;
 }
 
 /**
@@ -20,7 +20,7 @@ export function getCurrentPlatform(): PlatformInfo | null {
  * @returns Platform information or null if not found
  */
 export function getPlatformByIdentifier(identifier: string): PlatformInfo | null {
-    return SUPPORTED_PLATFORMS.find((p: any) => p.identifier === identifier) || null;
+    return SUPPORTED_PLATFORMS.find(p => p.identifier === identifier) || null;
 }
 
 /**
@@ -35,8 +35,13 @@ export function getBinaryPath(platformIdentifier: string, binary: 'ffmpeg' | 'ff
     if (!platform) {
         throw new Error(`Unsupported platform/architecture: ${platformIdentifier}`);
     }
-
-    return path.join(BINARIES_DIR, platformIdentifier, platform.binaryName[binary]);
+    
+    // Use proper binary name based on platform
+    const binaryName = platform.binaryName ? platform.binaryName[binary] : 
+        (platformIdentifier.startsWith('win32') ? `${binary}.exe` : binary);
+    
+    // Normalize path for cross-platform compatibility
+    return path.normalize(path.join(BINARIES_DIR, platformIdentifier, binaryName));
 }
 
 /**
@@ -45,5 +50,6 @@ export function getBinaryPath(platformIdentifier: string, binary: 'ffmpeg' | 'ff
  * @returns Path to the platform directory
  */
 export function getPlatformDir(platformIdentifier: string): string {
-    return path.join(BINARIES_DIR, platformIdentifier);
+    // Normalize path for cross-platform compatibility
+    return path.normalize(path.join(BINARIES_DIR, platformIdentifier));
 }

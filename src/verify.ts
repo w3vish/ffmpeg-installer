@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { promises as fsPromises } from 'fs';
 
 /**
  * Verify if a file exists and is executable
@@ -22,12 +21,29 @@ export function verifyFile(filePath: string): boolean {
  */
 export async function ensureDir(dirPath: string): Promise<void> {
   try {
-    await fsPromises.mkdir(dirPath, { recursive: true });
-  } catch (err) {
-    // Directory already exists or cannot be created
-    if ((err as NodeJS.ErrnoException).code !== 'EEXIST') {
-      throw err;
+    // Normalize the path to handle Windows backslashes
+    const normalizedPath = path.normalize(dirPath);
+    
+    // Check if directory already exists
+    if (fs.existsSync(normalizedPath)) {
+      const stats = fs.statSync(normalizedPath);
+      if (stats.isDirectory()) {
+        return; // Directory already exists
+      }
     }
+
+    // Create directory with recursive option
+    await fs.promises.mkdir(normalizedPath, { recursive: true });
+    
+    // Verify directory was created
+    if (!fs.existsSync(normalizedPath)) {
+      throw new Error(`Failed to create directory: ${normalizedPath}`);
+    }
+    
+    console.log(`Created directory: ${normalizedPath}`);
+  } catch (err) {
+    console.error(`Error creating directory ${dirPath}: ${(err as Error).message}`);
+    throw err;
   }
 }
 
@@ -37,11 +53,11 @@ export async function ensureDir(dirPath: string): Promise<void> {
  */
 export async function makeExecutable(filePath: string): Promise<void> {
   try {
-    const stats = await fsPromises.stat(filePath);
+    const stats = await fs.promises.stat(filePath);
     
     // Add executable permissions (read/write/execute for owner, read/execute for group and others)
     const mode = stats.mode | 0o755;
-    await fsPromises.chmod(filePath, mode);
+    await fs.promises.chmod(filePath, mode);
   } catch (err) {
     throw new Error(`Failed to make file executable: ${filePath}, error: ${(err as Error).message}`);
   }
@@ -77,5 +93,5 @@ export async function createInitialConfig(configPath: string): Promise<void> {
   };
 
   await ensureDir(path.dirname(configPath));
-  await fsPromises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+  await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
 }

@@ -1,21 +1,16 @@
 import path from 'path';
-import { PlatformInfo, DownloadSource } from './types.js';
 import { fileURLToPath } from 'url';
+import { DownloadSource, PlatformInfo } from './types.js';
 
+// Get the directory where the package is installed
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Base directory for binaries
+export const BINARIES_DIR = path.resolve(__dirname, '..', 'binaries');
 
-/**
- * Base directory for storing binaries
- */
-export const BINARIES_DIR = path.join(__dirname, '..', 'binaries');
-
-/**
- * Configuration file path
- */
-export const CONFIG_FILE_PATH = path.join(BINARIES_DIR, 'config.json');
-
+// Path to configuration file
+export const CONFIG_FILE_PATH = path.resolve(__dirname, '..', 'config.json');
 /**
  * Supported platforms
  */

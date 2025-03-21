@@ -1,11 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
-import { promises as fsPromises } from 'fs';
 import { CONFIG_FILE_PATH } from './constants.js';
 import { getPlatformDir } from './paths.js';
 import { ConfigFile } from './types.js';
-import { ensureDir, makeExecutable } from './verify.js';
 
 // Repository info for GitHub releases
 const GITHUB_REPO = 'w3vish/ffmpeg-installer';
@@ -15,6 +13,11 @@ const GITHUB_RELEASE_TAG = 'v1.0.0'; // Update this when you create new releases
  * Download a file from a URL with progress tracking
  */
 async function downloadFile(url: string, destPath: string): Promise<void> {
+  // Ensure the directory exists before creating the write stream
+  const destDir = path.dirname(destPath);
+  await ensureDir(destDir);
+  
+  console.log(`Destination path: ${destPath}`);
   const writer = fs.createWriteStream(destPath);
 
   try {
@@ -71,11 +74,62 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
         console.log('\nDownload complete!');
         resolve();
       });
-      writer.on('error', reject);
+      writer.on('error', (err) => {
+        console.error(`Writer error: ${err.message}`);
+        reject(err);
+      });
     });
   } catch (error) {
     writer.close();
     throw new Error(`Failed to download from ${url}: ${(error as Error).message}`);
+  }
+}
+
+/**
+ * Ensure a directory exists
+ * @param dirPath Path to the directory
+ */
+async function ensureDir(dirPath: string): Promise<void> {
+  try {
+    // Check if directory exists
+    try {
+      const stats = fs.statSync(dirPath);
+      if (stats.isDirectory()) {
+        return; // Directory already exists
+      }
+      // If it exists but is not a directory, we have a problem
+      throw new Error(`Path exists but is not a directory: ${dirPath}`);
+    } catch (err) {
+      // ENOENT means the directory doesn't exist, which is fine
+      if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw err;
+      }
+    }
+    
+    // Create the directory recursively
+    console.log(`Creating directory: ${dirPath}`);
+    fs.mkdirSync(dirPath, { recursive: true });
+  } catch (err) {
+    throw new Error(`Failed to create directory ${dirPath}: ${(err as Error).message}`);
+  }
+}
+
+/**
+ * Make a file executable
+ * @param filePath Path to the file
+ */
+async function makeExecutable(filePath: string): Promise<void> {
+  try {
+    // Only apply chmod on non-Windows platforms
+    if (process.platform !== 'win32') {
+      const stats = fs.statSync(filePath);
+      
+      // Add executable permissions (read/write/execute for owner, read/execute for group and others)
+      const mode = stats.mode | 0o755;
+      fs.chmodSync(filePath, mode);
+    }
+  } catch (err) {
+    throw new Error(`Failed to make file executable: ${filePath}, error: ${(err as Error).message}`);
   }
 }
 
@@ -94,7 +148,10 @@ export async function downloadBinaries(
   installOptions: { ffmpeg: boolean; ffprobe: boolean } = { ffmpeg: true, ffprobe: true }
 ): Promise<void> {
   const platformDir = getPlatformDir(platformIdentifier);
+  
+  // Ensure platform directory exists
   await ensureDir(platformDir);
+  console.log(`Platform directory: ${platformDir}`);
 
   // Get binary names based on platform
   const isWindows = platformIdentifier.startsWith('win32');
@@ -113,9 +170,7 @@ export async function downloadBinaries(
       await downloadFile(ffmpegUrl, ffmpegDestPath);
       
       // Make binary executable (for non-Windows platforms)
-      if (!isWindows) {
-        await makeExecutable(ffmpegDestPath);
-      }
+      await makeExecutable(ffmpegDestPath);
     }
     
     // Download FFprobe if requested
@@ -127,9 +182,7 @@ export async function downloadBinaries(
       await downloadFile(ffprobeUrl, ffprobeDestPath);
       
       // Make binary executable (for non-Windows platforms)
-      if (!isWindows) {
-        await makeExecutable(ffprobeDestPath);
-      }
+      await makeExecutable(ffprobeDestPath);
     }
 
     // Update config file
@@ -157,8 +210,10 @@ async function updateConfig(
 
   // Read existing config or create new one
   try {
+    await ensureDir(path.dirname(CONFIG_FILE_PATH));
+    
     if (fs.existsSync(CONFIG_FILE_PATH)) {
-      const configData = await fsPromises.readFile(CONFIG_FILE_PATH, 'utf8');
+      const configData = fs.readFileSync(CONFIG_FILE_PATH, 'utf8');
       config = JSON.parse(configData);
     } else {
       config = {
@@ -199,5 +254,5 @@ async function updateConfig(
 
   // Save updated config
   await ensureDir(path.dirname(CONFIG_FILE_PATH));
-  await fsPromises.writeFile(CONFIG_FILE_PATH, JSON.stringify(config, null, 2), 'utf8');
+  fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify(config, null, 2), 'utf8');
 }
