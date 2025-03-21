@@ -3,23 +3,20 @@
   "version": "1.0.9",
   "type": "module",
   "description": "Cross-platform FFmpeg and FFprobe binary installer",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "build": "tsc && cp dist/index.js dist/index.cjs",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build"
   },
   "bin": {
     "ffmpeg-installer-demo": "./dist/installer.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run build",
-    "download-binaries": "ts-node src/scripts/download-binaries.ts"
   },
   "keywords": [
     "ffmpeg",
@@ -56,7 +53,6 @@
   },
   "dependencies": {
     "axios": "^1.8.4",
-    "date-fns": "^4.1.0",
     "readline": "^1.3.0"
   }
 }

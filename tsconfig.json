@@ -13,6 +13,6 @@
     "declarationDir": "./dist",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*"],  // Change from src/ to dist/
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
