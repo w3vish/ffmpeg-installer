@@ -3,7 +3,7 @@
   "version": "1.0.14",
   "type": "module",
   "description": "Cross-platform FFmpeg and FFprobe binary installer",
- "main": "dist/cjs/index.cjs",
+  "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {
@@ -16,7 +16,7 @@
     "prepublishOnly": "npm run build"
   },
   "bin": {
-    "ffmpeg-installer-demo": "./dist/installer.js"
+    "ffmpeg-installer-demo": "./dist/cjs/installer.cjs"
   },
   "keywords": [
     "ffmpeg",
@@ -43,7 +43,7 @@
     "dist",
     "README.md",
     "LICENSE",
-    "dist/install.js"
+    "dist/cjs/installer.cjs"
   ],
   "devDependencies": {
     "@types/node": "^20.17.24",
