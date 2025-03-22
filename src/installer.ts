@@ -1,18 +1,66 @@
 #!/usr/bin/env node
 
 import os from 'os';
-import { CONFIG_FILE_PATH } from './constants.js';
+import fs from 'fs';
+import path from 'path';
+import { CONFIG_FILE_PATH, SUPPORTED_PLATFORMS, ensureDirectoriesExist } from './constants.js';
 import { downloadBinaries } from './downloader.js';
-import { getCurrentPlatform } from './paths.js';
-import { verifyConfig, createInitialConfig } from './verify.js';
-
 import readline from 'readline';
+
+/**
+ * Get the current platform information
+ */
+function getCurrentPlatform() {
+  const platform = process.platform;
+  const arch = process.arch;
+
+  return SUPPORTED_PLATFORMS.find(p => p.platform === platform && p.arch === arch) || null;
+}
+
+/**
+ * Verify if config file exists and is valid
+ */
+function verifyConfig(configPath: string): boolean {
+  try {
+    if (!fs.existsSync(configPath)) {
+      return false;
+    }
+    
+    const configData = fs.readFileSync(configPath, 'utf8');
+    const config = JSON.parse(configData);
+    
+    // Basic validation
+    return typeof config === 'object' && config !== null && typeof config.platforms === 'object';
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Create initial config file
+ */
+async function createInitialConfig(configPath: string): Promise<void> {
+  const config = {
+    platforms: {},
+    lastUpdated: new Date().toISOString()
+  };
+  
+  const configDir = path.dirname(configPath);
+  if (!fs.existsSync(configDir)) {
+    fs.mkdirSync(configDir, { recursive: true });
+  }
+  
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf8');
+}
 
 /**
  * Main installation function
  */
 async function install(): Promise<void> {
   try {
+    // Ensure all directories exist
+    ensureDirectoriesExist();
+    
     // Create initial config file if it doesn't exist
     if (!verifyConfig(CONFIG_FILE_PATH)) {
       await createInitialConfig(CONFIG_FILE_PATH);
@@ -109,6 +157,7 @@ function promptForInstallation(): Promise<string> {
     });
   });
 }
+
 // Run the installation
 install().catch(error => {
   console.error(`Unexpected error during installation: ${error.message}`);

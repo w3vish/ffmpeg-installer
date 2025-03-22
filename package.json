@@ -1,6 +1,6 @@
 {
   "name": "@w3vish/ffmpeg-installer",
-  "version": "2.1.0",
+  "version": "2.2.1",
   "type": "module",
   "description": "A fast and lightweight cross-platform FFmpeg & FFprobe binary installer for Node.js, supporting Linux, macOS, and Windows.",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "prepublishOnly": "npm run build"
   },
   "bin": {
-    "ffmpeg-installer": "./dist/installer.js"
+    "ffmpeg-installer": "dist/installer.js"
   },
   "files": [
     "dist",
@@ -36,14 +36,11 @@
     "video converter",
     "ffmpeg npm"
   ],
-  "author": {
-    "name": "w3vish",
-    "url": "https://github.com/w3vish"
-  },
+  "author": "w3vish (https://github.com/w3vish)",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/w3vish/ffmpeg-installer"
+    "url": "git+https://github.com/w3vish/ffmpeg-installer.git"
   },
   "bugs": {
     "url": "https://github.com/w3vish/ffmpeg-installer/issues"

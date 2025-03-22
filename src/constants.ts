@@ -1,16 +1,54 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
+import os from 'os';
+import fs from 'fs';
 import { DownloadSource, PlatformInfo } from './types.js';
 
-// Get the directory where the package is installed
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+/**
+ * Get user's home directory in a cross-platform way
+ */
+export function getUserHomeDir(): string {
+  return os.homedir();
+}
 
-// Base directory for binaries
-export const BINARIES_DIR = path.resolve(__dirname, '..', 'binaries');
+/**
+ * Get application data directory based on platform
+ */
+export function getAppDataDir(): string {
+  const homeDir = getUserHomeDir();
+  
+  // Platform-specific app data locations
+  switch (os.platform()) {
+    case 'win32':
+      return process.env.APPDATA || path.join(homeDir, 'AppData', 'Roaming');
+    case 'darwin':
+      return path.join(homeDir, 'Library', 'Application Support');
+    default: // Linux and others
+      return process.env.XDG_DATA_HOME || path.join(homeDir, '.local', 'share');
+  }
+}
 
-// Path to configuration file
-export const CONFIG_FILE_PATH = path.resolve(__dirname, '..', 'config.json');
+// Define a consistent application name for storing data
+export const APP_NAME = 'ffmpeg-installer';
+
+// Directory for storing FFmpeg binaries
+export const BINARIES_DIR = path.join(getAppDataDir(), APP_NAME, 'binaries');
+
+// Path to the configuration file
+export const CONFIG_FILE_PATH = path.join(getAppDataDir(), APP_NAME, 'config.json');
+
+// Make sure directories exist
+export function ensureDirectoriesExist(): void {
+  const dirs = [
+    path.dirname(CONFIG_FILE_PATH),
+    BINARIES_DIR
+  ];
+  
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  }
+}
 /**
  * Supported platforms
  */

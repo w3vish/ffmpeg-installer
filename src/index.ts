@@ -1,18 +1,26 @@
+// index.ts
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { BINARIES_DIR, CONFIG_FILE_PATH, SUPPORTED_PLATFORMS } from './constants.js';
-import { getCurrentPlatform } from './paths.js';
+import { CONFIG_FILE_PATH, BINARIES_DIR, ensureDirectoriesExist, SUPPORTED_PLATFORMS } from './constants.js';
 import { ConfigFile } from './types.js';
 
-// Get the directory where the package is installed
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+/**
+ * Get the current platform information
+ */
+function getCurrentPlatform() {
+  const platform = process.platform;
+  const arch = process.arch;
+
+  return SUPPORTED_PLATFORMS.find(p => p.platform === platform && p.arch === arch) || null;
+}
 
 /**
  * Get the installed FFmpeg binaries for the current platform
  */
 function getInstalledBinaries() {
+  // Ensure directories exist
+  ensureDirectoriesExist();
+  
   const currentPlatform = getCurrentPlatform();
   
   if (!currentPlatform) {

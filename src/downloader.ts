@@ -1,13 +1,41 @@
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
-import { CONFIG_FILE_PATH } from './constants.js';
-import { getPlatformDir } from './paths.js';
+import { CONFIG_FILE_PATH, BINARIES_DIR, ensureDirectoriesExist } from './constants.js';
 import { ConfigFile } from './types.js';
 
 // Repository info for GitHub releases
 const GITHUB_REPO = 'w3vish/ffmpeg-installer';
 const GITHUB_RELEASE_TAG = 'v1.0.0'; // Update this when you create new releases
+
+/**
+ * Ensure a directory exists
+ * @param dirPath Path to the directory
+ */
+async function ensureDir(dirPath: string): Promise<void> {
+  try {
+    // Check if directory exists
+    try {
+      const stats = fs.statSync(dirPath);
+      if (stats.isDirectory()) {
+        return; // Directory already exists
+      }
+      // If it exists but is not a directory, we have a problem
+      throw new Error(`Path exists but is not a directory: ${dirPath}`);
+    } catch (err) {
+      // ENOENT means the directory doesn't exist, which is fine
+      if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw err;
+      }
+    }
+    
+    // Create the directory recursively
+    console.log(`Creating directory: ${dirPath}`);
+    fs.mkdirSync(dirPath, { recursive: true });
+  } catch (err) {
+    throw new Error(`Failed to create directory ${dirPath}: ${(err as Error).message}`);
+  }
+}
 
 /**
  * Download a file from a URL with progress tracking
@@ -86,35 +114,6 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
 }
 
 /**
- * Ensure a directory exists
- * @param dirPath Path to the directory
- */
-async function ensureDir(dirPath: string): Promise<void> {
-  try {
-    // Check if directory exists
-    try {
-      const stats = fs.statSync(dirPath);
-      if (stats.isDirectory()) {
-        return; // Directory already exists
-      }
-      // If it exists but is not a directory, we have a problem
-      throw new Error(`Path exists but is not a directory: ${dirPath}`);
-    } catch (err) {
-      // ENOENT means the directory doesn't exist, which is fine
-      if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
-        throw err;
-      }
-    }
-    
-    // Create the directory recursively
-    console.log(`Creating directory: ${dirPath}`);
-    fs.mkdirSync(dirPath, { recursive: true });
-  } catch (err) {
-    throw new Error(`Failed to create directory ${dirPath}: ${(err as Error).message}`);
-  }
-}
-
-/**
  * Make a file executable
  * @param filePath Path to the file
  */
@@ -141,12 +140,22 @@ function getGitHubReleaseUrl(platformIdentifier: string, binaryName: string): st
 }
 
 /**
+ * Get the platform directory
+ */
+function getPlatformDir(platformIdentifier: string): string {
+  return path.join(BINARIES_DIR, platformIdentifier);
+}
+
+/**
  * Download and install binaries for a specific platform from GitHub releases
  */
 export async function downloadBinaries(
   platformIdentifier: string, 
   installOptions: { ffmpeg: boolean; ffprobe: boolean } = { ffmpeg: true, ffprobe: true }
 ): Promise<void> {
+  // Ensure all directories exist
+  ensureDirectoriesExist();
+  
   const platformDir = getPlatformDir(platformIdentifier);
   
   // Ensure platform directory exists
@@ -210,8 +219,6 @@ async function updateConfig(
 
   // Read existing config or create new one
   try {
-    await ensureDir(path.dirname(CONFIG_FILE_PATH));
-    
     if (fs.existsSync(CONFIG_FILE_PATH)) {
       const configData = fs.readFileSync(CONFIG_FILE_PATH, 'utf8');
       config = JSON.parse(configData);
@@ -253,6 +260,5 @@ async function updateConfig(
   config.lastUpdated = new Date().toISOString();
 
   // Save updated config
-  await ensureDir(path.dirname(CONFIG_FILE_PATH));
   fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify(config, null, 2), 'utf8');
 }
